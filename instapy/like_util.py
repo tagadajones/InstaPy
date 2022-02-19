@@ -619,6 +619,28 @@ def check_link(
         is_video = media["media_type"] == 2
         user_name = media["user"]["username"]
         image_text = media["caption"]["text"]
+        owner_comments = None
+        try:
+            owner_comments = browser.execute_script(
+                """
+                latest_comments = window._sharedData.entry_data.PostPage[
+                0].media.comments.nodes;
+                if (latest_comments === undefined) {
+                    latest_comments = Array();
+                    owner_comments = latest_comments
+                        .filter(item => item.user.username == arguments[0])
+                        .map(item => item.text)
+                        .reduce((item, total) => item + '\\n' + total, '');
+                    return owner_comments;}
+                else {
+                    return null;}
+            """,
+                user_name,
+            )
+        except Exception as e:
+            print(f"Owner comments not found, exception: {e}")
+
+    owner_comments = owner_comments if owner_comments else None
 
     if owner_comments == "":
         owner_comments = None
