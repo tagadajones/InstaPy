@@ -1143,6 +1143,15 @@ class InstaPy:
 
         return self
 
+    def meets_follow_conditions(self, user_name, checked_img, following):
+        return (
+            self.do_follow
+            and user_name not in self.dont_include
+            and checked_img
+            and following
+            and not follow_restriction("read", user_name, self.follow_times, self.logger)
+        )
+
     def follow_by_list(
         self,
         followlist: list,
@@ -1639,15 +1648,7 @@ class InstaPy:
                                 sleep(1)
 
                             # following
-                            if (
-                                self.do_follow
-                                and user_name not in self.dont_include
-                                and checked_img
-                                and following
-                                and not follow_restriction(
-                                    "read", user_name, self.follow_times, self.logger
-                                )
-                            ):
+                            if self.meets_follow_conditions(user_name, checked_img, following):
 
                                 follow_state, msg = follow_user(
                                     self.browser,
@@ -1661,6 +1662,7 @@ class InstaPy:
                                 )
                                 if follow_state is True:
                                     followed += 1
+                                    self.logger.info("--> Following User !")
 
                             else:
                                 self.logger.info("--> Not following")
@@ -1840,18 +1842,7 @@ class InstaPy:
                                 # successful comment
                                 self.jumps["consequent"]["comments"] = 0
                                 # try to follow
-                                if (
-                                    self.do_follow
-                                    and user_name not in self.dont_include
-                                    and checked_img
-                                    and following
-                                    and not follow_restriction(
-                                        "read",
-                                        user_name,
-                                        self.follow_times,
-                                        self.logger,
-                                    )
-                                ):
+                                if self.meets_follow_conditions(user_name, checked_img, following):
                                     follow_state, msg = follow_user(
                                         self.browser,
                                         "post",
@@ -1864,6 +1855,7 @@ class InstaPy:
                                     )
                                     if follow_state is True:
                                         followed += 1
+                                        self.logger.info("--> Following User !")
                                 else:
                                     self.logger.info("--> Not following")
                                     sleep(1)
@@ -2079,16 +2071,7 @@ class InstaPy:
                                 sleep(1)
 
                             # following
-                            if (
-                                self.do_follow
-                                and user_name not in self.dont_include
-                                and checked_img
-                                and following
-                                and not follow_restriction(
-                                    "read", user_name, self.follow_times, self.logger
-                                )
-                            ):
-
+                            if self.meets_follow_conditions(user_name, checked_img, following):
                                 follow_state, msg = follow_user(
                                     self.browser,
                                     "post",
@@ -2101,6 +2084,7 @@ class InstaPy:
                                 )
                                 if follow_state is True:
                                     followed += 1
+                                    self.logger.info("--> Following User !")
                             else:
                                 self.logger.info("--> Not following")
                                 sleep(1)
@@ -2229,14 +2213,7 @@ class InstaPy:
                 self.logger.error("Element not found, skipping this username")
                 continue
 
-            if (
-                self.do_follow
-                and username not in self.dont_include
-                and following
-                and not follow_restriction(
-                    "read", username, self.follow_times, self.logger
-                )
-            ):
+            if self.meets_follow_conditions(username, True, following):
                 follow_state, msg = follow_user(
                     self.browser,
                     "profile",
@@ -2249,6 +2226,7 @@ class InstaPy:
                 )
                 if follow_state is True:
                     followed += 1
+                    self.logger.info("--> Following User !")
             else:
                 self.logger.info("--> Not following")
                 sleep(1)
@@ -2699,9 +2677,11 @@ class InstaPy:
 
                 if follow_state is True:
                     followed += 1
+                    self.logger.info("--> Following User !")
 
                 elif msg == "already followed":
                     already_followed += 1
+                    self.logger.info("--> Already following user")
 
             else:
                 self.logger.info("--> Not following")
@@ -3015,9 +2995,11 @@ class InstaPy:
                 )
                 if follow_state is True:
                     followed += 1
+                    self.logger.info("--> Following User !")
 
                 elif msg == "already followed":
                     already_followed += 1
+                    self.logger.info("--> Already followed user")
 
             else:
                 self.logger.info("--> Not following")
@@ -4348,18 +4330,7 @@ class InstaPy:
                                         sleep(1)
 
                                     # following
-                                    if (
-                                        self.do_follow
-                                        and user_name not in self.dont_include
-                                        and checked_img
-                                        and following
-                                        and not follow_restriction(
-                                            "read",
-                                            user_name,
-                                            self.follow_times,
-                                            self.logger,
-                                        )
-                                    ):
+                                    if self.meets_follow_conditions(username, checked_img, following):
                                         follow_state, msg = follow_user(
                                             self.browser,
                                             "post",
@@ -4372,6 +4343,7 @@ class InstaPy:
                                         )
                                         if follow_state is True:
                                             followed += 1
+                                            self.logger.info("--> Following User !")
                                     else:
                                         self.logger.info("--> Not following")
                                         sleep(1)
@@ -5135,15 +5107,7 @@ class InstaPy:
                             self.logger.info("--> Not commented")
                             sleep(1)
 
-                        if (
-                            self.do_follow
-                            and user_name not in self.dont_include
-                            and checked_img
-                            and following
-                            and not follow_restriction(
-                                "read", user_name, self.follow_times, self.logger
-                            )
-                        ):
+                        if self.meets_follow_conditions(user_name, checked_img, following):
                             follow_state, msg = follow_user(
                                 self.browser,
                                 "post",
@@ -5157,6 +5121,7 @@ class InstaPy:
 
                             if follow_state is True:
                                 followed += 1
+                                self.logger.info("--> Following User !")
                         else:
                             self.logger.info("--> Not following")
                             sleep(1)
